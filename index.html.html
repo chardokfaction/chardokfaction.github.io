@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chardok Faction Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #282c34;
+      color: #61dafb;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      margin-top: 20px;
+      font-size: 2.5em;
+    }
+
+    #jumbotron {
+      margin: 20px auto;
+      height: 200px;
+      width: 100%;
+      background-color: #20232a;
+      background-image: url('chardok.jpg'); /* Placeholder for Chardok image */
+      background-size: cover;
+      background-position: center;
+    }
+
+    #calculator {
+      background-color: #20232a;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 50px auto;
+      width: 80%;
+      max-width: 600px;
+    }
+
+    label {
+      font-size: 1.2em;
+    }
+
+    .input-container {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .input-container img {
+      width: 50px;
+      height: 50px;
+    }
+
+    input[type="number"], select {
+      font-size: 1.2em;
+      padding: 8px;
+      margin: 10px;
+      border-radius: 5px;
+      border: 2px solid #61dafb;
+      background-color: #20232a;
+      color: #61dafb;
+      width: 45%;
+    }
+
+    button {
+      font-size: 1.5em;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background-color: #61dafb;
+      color: #20232a;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    #result, #factionBarContainer, #howMuchToAlly {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .bar-container {
+      background-color: #555;
+      width: 80%;
+      margin: 0 auto;
+      height: 30px;
+      position: relative;
+    }
+
+    .bar {
+      height: 100%;
+      background-color: #4caf50;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .bar-label {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 1.2em;
+      line-height: 30px;
+        margin-top: -30px;
+    }
+
+    .indicator {
+      position: absolute;
+      height: 30px;
+      width: 2px;
+      background-color: white;
+        margin-top: -30px
+        
+    }
+
+    #howMuchToAlly {
+      font-size: 1.3em;
+      color: #61dafb;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Chardok Faction Calculator</h1>
+
+  <div id="jumbotron">
+    <!-- Placeholder for Chardok image -->
+  </div>
+
+  <div id="calculator">
+    <label for="startingFaction">Current Faction Level:</label>
+    <select id="startingFaction">
+      <option value="-2000">Ready to Attack (-2000)</option>
+      <option value="-750">Threatening (-750)</option>
+      <option value="-500">Dubious (-500)</option>
+      <option value="-100">Apprehensive (-100)</option>
+      <option value="0">Indifferent (0)</option>
+      <option value="100">Amiable (100)</option>
+      <option value="500">Kindly (500)</option>
+      <option value="750">Warmly (750)</option>
+      <option value="1100">Ally (1100)</option>
+    </select>
+
+    <!-- Goblin Skins Section -->
+    <div class="input-container">
+      <img src="skin.jpg" alt="Goblin Skin"> <!-- Placeholder for Goblin Skin image -->
+      <div>
+        <label for="goblinSkinsStack">Goblin Skins (Stacks of 20):</label>
+        <input type="number" id="goblinSkinsStack" value="0" min="0">
+      </div>
+      <div>
+        <label for="goblinSkinsExact">Exact Goblin Skins:</label>
+        <input type="number" id="goblinSkinsExact" value="0" min="0">
+      </div>
+    </div>
+
+    <!-- Mineral Salts Section -->
+    <div class="input-container">
+      <img src="salts.jpg" alt="Mineral Salt"> <!-- Placeholder for Salt image -->
+      <div>
+        <label for="saltsStack">Mineral Salts (Stacks of 20):</label>
+        <input type="number" id="saltsStack" value="0" min="0">
+      </div>
+      <div>
+        <label for="saltsExact">Exact Mineral Salts:</label>
+        <input type="number" id="saltsExact" value="0" min="0">
+      </div>
+    </div>
+
+    <button onclick="calculateFaction()">Calculate</button>
+
+    <div id="result"></div>
+    <div id="factionBarContainer">
+      <div class="bar-container">
+        <div class="bar" id="factionBar"></div>
+        <div class="bar-label" id="factionBarLabel">Faction: -2000</div>
+        <!-- Indicators for faction levels -->
+        <div class="indicator" style="left: 0%;"></div>
+        <div class="indicator" style="left: 12.5%;"></div>
+        <div class="indicator" style="left: 25%;"></div>
+        <div class="indicator" style="left: 37.5%;"></div>
+        <div class="indicator" style="left: 50%;"></div>
+        <div class="indicator" style="left: 62.5%;"></div>
+        <div class="indicator" style="left: 75%;"></div>
+        <div class="indicator" style="left: 87.5%;"></div>
+        <div class="indicator" style="left: 100%;"></div>
+      </div>
+    </div>
+    <div id="howMuchToAlly"></div>
+  </div>
+
+  <script>
+    function calculateFaction() {
+      const startFaction = parseInt(document.getElementById("startingFaction").value);
+
+      // Goblin Skins
+      const skinsStack = parseInt(document.getElementById("goblinSkinsStack").value);
+      const skinsExact = parseInt(document.getElementById("goblinSkinsExact").value);
+      const totalSkins = (skinsStack * 20) + skinsExact;
+      const skinsFactionGain = totalSkins * 3;
+
+      // Mineral Salts
+      const saltsStack = parseInt(document.getElementById("saltsStack").value);
+      const saltsExact = parseInt(document.getElementById("saltsExact").value);
+      const totalSalts = (saltsStack * 20) + saltsExact;
+      const saltsFactionGain = Math.floor(totalSalts / 2) * 3;
+
+      // Total faction gain
+      const totalFactionGain = skinsFactionGain + saltsFactionGain;
+      const finalFaction = startFaction + totalFactionGain;
+
+      // Update result
+      const factionLevel = getFactionLevel(finalFaction);
+      const resultDiv = document.getElementById('result');
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = `
+        <p>Goblin Skins Faction Gain: ${skinsFactionGain}</p>
+        <p>Mineral Salts Faction Gain: ${saltsFactionGain}</p>
+        <p>Total Faction Gain: ${totalFactionGain}</p>
+        <p>Your new faction is: ${factionLevel} (${finalFaction})</p>
+      `;
+
+      // Update faction bar
+      updateFactionBar(finalFaction, startFaction, totalFactionGain);
+
+      // Calculate how much left to reach Ally
+      const toAlly = 1100 - finalFaction;
+      const howMuchToAlly = document.getElementById('howMuchToAlly');
+      howMuchToAlly.style.display = 'block';
+      howMuchToAlly.textContent = `You need ${Math.ceil(toAlly / 3)} more goblin skins or ${Math.ceil(toAlly / 1.5)} more salts to reach Ally.`;
+    }
+
+    function updateFactionBar(finalFaction, startFaction, totalFactionGain) {
+      const factionBar = document.getElementById('factionBar');
+      const factionBarLabel = document.getElementById('factionBarLabel');
+      const factionBarContainer = document.getElementById('factionBarContainer');
+      
+      // Calculate percentage for the faction bar (based on a range from -2000 to 2000)
+      const maxFaction = 2000;
+      const percentage = ((finalFaction + 2000) / (maxFaction + 2000)) * 100;
+
+      // Update the faction bar
+      factionBar.style.width = `${percentage}%`;
+      factionBarLabel.textContent = `Faction: ${finalFaction}`;
+      
+      // Show the bar container
+      factionBarContainer.style.display = 'block';
+    }
+
+    function getFactionLevel(faction) {
+      if (faction >= 1100) return 'Ally';
+      if (faction >= 750) return 'Warmly';
+      if (faction >= 500) return 'Kindly';
+      if (faction >= 100) return 'Amiable';
+      if (faction >= 0) return 'Indifferent';
+      if (faction >= -100) return 'Apprehensive';
+      if (faction >= -500) return 'Dubious';
+      if (faction >= -750) return 'Threatening';
+      return 'Ready to Attack';
+    }
+  </script>
+</body>
+</html>
+
+
+
